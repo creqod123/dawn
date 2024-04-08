@@ -79,7 +79,7 @@
 
               <tbody>
                 {%- for item in cart.items -%}
-                  <tr class="cart-item" id="CartItem-{{ item.index | plus: 1 }}">
+                  <tr  data-hulkapps-lineitem class="cart-item" id="CartItem-{{ item.index | plus: 1 }}">
                     <td class="cart-item__media">
                       {% if item.image %}
                         {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
@@ -109,18 +109,18 @@
                           <span class="visually-hidden">
                             {{ 'products.product.price.regular_price' | t }}
                           </span>
-                          <s class="cart-item__old-price product-option">
+                          <s  data-hulkapps-ci-price data-key='{{item.key}}' class="cart-item__old-price product-option">
                             {{- item.original_price | money -}}
                           </s>
                           <span class="visually-hidden">
                             {{ 'products.product.price.sale_price' | t }}
                           </span>
-                          <strong class="cart-item__final-price product-option">
+                          <strong  data-hulkapps-ci-price data-key='{{item.key}}' class="cart-item__final-price product-option">
                             {{ item.final_price | money }}
                           </strong>
                         </div>
                       {%- else -%}
-                        <div class="product-option">
+                        <div  data-hulkapps-ci-price data-key='{{item.key}}' class="product-option">
                           {{ item.original_price | money }}
                         </div>
                       {%- endif -%}
@@ -139,6 +139,7 @@
                             {%- endfor -%}
                           {%- endif -%}
 
+<span data-hulkapps-line-properties>
                           {%- for property in item.properties -%}
                             {%- assign property_first_char = property.first | slice: 0 -%}
                             {%- if property.last != blank and property_first_char != '_' -%}
@@ -156,6 +157,8 @@
                               </div>
                             {%- endif -%}
                           {%- endfor -%}
+</span>
+<button type='button' style='display: none;' class='edit_cart_option btn btn--primary button' data-product_id='{{item.product_id}}' data-key='{{item.key}}' data-variant_id='{{item.variant_id}}' data-quantity='{{item.quantity}}'>Edit Options</button>
                         </dl>
 
                         <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name }}</p>
@@ -180,19 +183,19 @@
                               {{ 'products.product.price.regular_price' | t }}
                             </dt>
                             <dd>
-                              <s class="cart-item__old-price price price--end">
+                              <s  data-hulkapps-line-price data-key='{{item.key}}' class="cart-item__old-price price price--end">
                                 {{ item.original_line_price | money }}
                               </s>
                             </dd>
                             <dt class="visually-hidden">
                               {{ 'products.product.price.sale_price' | t }}
                             </dt>
-                            <dd class="price price--end">
+                            <dd  data-hulkapps-line-price data-key='{{item.key}}' class="price price--end">
                               {{ item.final_line_price | money }}
                             </dd>
                           </dl>
                         {%- else -%}
-                          <span class="price price--end">
+                          <span  data-hulkapps-line-price data-key='{{item.key}}' class="price price--end">
                             {{ item.original_line_price | money }}
                           </span>
                         {%- endif -%}
@@ -235,13 +238,13 @@
                               <button
                                 type="button"
                                 aria-expanded="false"
-                                class="quantity-popover__info-button quantity-popover__info-button--icon-only button button--tertiary small-hide"
+                                class="quantity-popover__info-button quantity-popover__info-button--icon-only button button--tertiary small-hide no-js-hidden"
                               >
                                 {% render 'icon-info' %}
                               </button>
                             {%- endif -%}
                             <quantity-input class="quantity cart-quantity">
-                              <button class="quantity__button" name="minus" type="button">
+                              <button class="quantity__button no-js-hidden" name="minus" type="button">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.decrease' | t: product: item.product.title | escape -}}
                                 </span>
@@ -255,8 +258,7 @@
                                 value="{{ item.quantity }}"
                                 {% # theme-check-disable %}
                                 data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
-                                min="0"
-                                data-min="{{ item.variant.quantity_rule.min }}"
+                                min="{{ item.variant.quantity_rule.min }}"
                                 {% if item.variant.quantity_rule.max != null %}
                                   max="{{ item.variant.quantity_rule.max }}"
                                 {% endif %}
@@ -266,7 +268,7 @@
                                 id="Quantity-{{ item.index | plus: 1 }}"
                                 data-index="{{ item.index | plus: 1 }}"
                               >
-                              <button class="quantity__button" name="plus" type="button">
+                              <button class="quantity__button no-js-hidden" name="plus" type="button">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
                                 </span>
@@ -314,7 +316,7 @@
                                 {{- 'products.product.volume_pricing.title' | t -}}
                               </span>
                             {%- endif -%}
-                            <div class="quantity__rules caption">
+                            <div class="quantity__rules caption no-js-hidden">
                               {%- if item.variant.quantity_rule.increment > 1 -%}
                                 <span class="divider">
                                   {{-
@@ -326,7 +328,7 @@
                               {%- if item.variant.quantity_rule.min > 1 -%}
                                 <span class="divider">
                                   {{-
-                                    'products.product.quantity.min_of'
+                                    'products.product.quantity.minimum_of'
                                     | t: quantity: item.variant.quantity_rule.min
                                   -}}
                                 </span>
@@ -334,7 +336,7 @@
                               {%- if item.variant.quantity_rule.max != null -%}
                                 <span class="divider">
                                   {{-
-                                    'products.product.quantity.max_of'
+                                    'products.product.quantity.maximum_of'
                                     | t: quantity: item.variant.quantity_rule.max
                                   -}}
                                 </span>
@@ -396,19 +398,19 @@
                               {{ 'products.product.price.regular_price' | t }}
                             </dt>
                             <dd>
-                              <s class="cart-item__old-price price price--end">
+                              <s  data-hulkapps-line-price data-key='{{item.key}}' class="cart-item__old-price price price--end">
                                 {{ item.original_line_price | money }}
                               </s>
                             </dd>
                             <dt class="visually-hidden">
                               {{ 'products.product.price.sale_price' | t }}
                             </dt>
-                            <dd class="price price--end">
+                            <dd  data-hulkapps-line-price data-key='{{item.key}}' class="price price--end">
                               {{ item.final_line_price | money }}
                             </dd>
                           </dl>
                         {%- else -%}
-                          <span class="price price--end">
+                          <span  data-hulkapps-line-price data-key='{{item.key}}' class="price price--end">
                             {{ item.original_line_price | money }}
                           </span>
                         {%- endif -%}
